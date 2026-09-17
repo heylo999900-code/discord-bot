@@ -31,29 +31,18 @@ async def on_member_join(member):
         return
 
     embed = discord.Embed(
-        title="👋 Welcome to the Server!",
+        title="╭━━━〔 👋 WELCOME 〕━━━╮",
         description=(
-            f"Welcome {member.mention}!\n\n"
-            f"We are happy to have you here in "
-            f"**{member.guild.name}** 🎉\n\n"
-            f"Please read the rules and enjoy your stay!"
+            f"🎉 **Welcome {member.mention}!**\n\n"
+            f"💙 Welcome to **{member.guild.name}**!\n"
+            f"✨ We're happy to have you here.\n\n"
+            f"📜 Please read the rules and enjoy your stay!\n"
+            f"🌟 Have fun with the community! 🎊"
         ),
         color=discord.Color.green()
     )
 
     embed.set_thumbnail(url=member.display_avatar.url)
-
-    embed.add_field(
-        name="👤 Member",
-        value=member.name,
-        inline=True
-    )
-
-    embed.add_field(
-        name="👥 Members",
-        value=str(member.guild.member_count),
-        inline=True
-    )
 
     if member.guild.icon:
         embed.set_author(
@@ -61,9 +50,25 @@ async def on_member_join(member):
             icon_url=member.guild.icon.url
         )
 
-    embed.set_footer(
-        text=f"Welcome to {member.guild.name}!"
+    embed.add_field(
+        name="👥 Members",
+        value=f"**{member.guild.member_count}**",
+        inline=True
     )
+
+    embed.add_field(
+        name="👤 New Member",
+        value=f"**{member.name}**",
+        inline=True
+    )
+
+    if member.guild.icon:
+        embed.set_footer(
+            text=f"Welcome to {member.guild.name}",
+            icon_url=member.guild.icon.url
+        )
+    else:
+        embed.set_footer(text=f"Welcome to {member.guild.name}")
 
     await channel.send(embed=embed)
 
@@ -76,7 +81,7 @@ async def on_member_remove(member):
     )
 
     if channel is None:
-        print("Welcome channel not found.")
+        print("Leave channel not found.")
         return
 
     embed = discord.Embed(
