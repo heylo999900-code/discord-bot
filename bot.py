@@ -23,7 +23,7 @@ async def on_ready():
 async def on_member_join(member):
     channel = discord.utils.get(
         member.guild.text_channels,
-        name="welcome"
+        name="『👋』・server-join"
     )
 
     if channel is None:
@@ -72,7 +72,7 @@ async def on_member_join(member):
 async def on_member_remove(member):
     channel = discord.utils.get(
         member.guild.text_channels,
-        name="welcome"
+        name="『🚪』・server-left"
     )
 
     if channel is None:
