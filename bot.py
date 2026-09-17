@@ -1,26 +1,24 @@
+import os
 import discord
 from discord.ext import commands
-import config
 
-# Bot permissions
+# Discord intents
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 
-# Create bot
+# Bot setup
 bot = commands.Bot(
     command_prefix="!",
     intents=intents
 )
 
 
-# When bot comes online
 @bot.event
 async def on_ready():
     print(f"Bot is Ready! Logged in as {bot.user}")
 
 
-# Welcome message
 @bot.event
 async def on_member_join(member):
     channel = discord.utils.get(
@@ -28,38 +26,48 @@ async def on_member_join(member):
         name="welcome"
     )
 
-    if channel:
-        embed = discord.Embed(
-            title="👋 Welcome to the Server!",
-            description=(
-                f"Welcome {member.mention} to "
-                f"**{member.guild.name}**! 🎉\n\n"
-                f"👤 **Username:** {member.name}\n"
-                f"🆔 **Member:** #{member.guild.member_count}\n"
-                f"👥 **Total Members:** {member.guild.member_count}"
-            ),
-            color=discord.Color.blue()
-        )
+    if channel is None:
+        print("Welcome channel not found.")
+        return
 
-        # Member profile picture
+    embed = discord.Embed(
+        title="👋 Welcome to the Server!",
+        description=(
+            f"Welcome {member.mention}!\n\n"
+            f"We are happy to have you here in "
+            f"**{member.guild.name}** 🎉\n\n"
+            f"Please read the rules and enjoy your stay!"
+        ),
+        color=discord.Color.green()
+    )
+
+    embed.set_thumbnail(url=member.display_avatar.url)
+
+    embed.add_field(
+        name="👤 Member",
+        value=member.name,
+        inline=True
+    )
+
+    embed.add_field(
+        name="👥 Members",
+        value=str(member.guild.member_count),
+        inline=True
+    )
+
+    if member.guild.icon:
         embed.set_author(
-            name=member.name,
-            icon_url=member.display_avatar.url
+            name=member.guild.name,
+            icon_url=member.guild.icon.url
         )
 
-        # Server profile picture
-        if member.guild.icon:
-            embed.set_thumbnail(url=member.guild.icon.url)
+    embed.set_footer(
+        text=f"Welcome to {member.guild.name}!"
+    )
 
-        # Footer
-        embed.set_footer(
-            text=f"{member.guild.name} • Member #{member.guild.member_count}"
-        )
-
-        await channel.send(embed=embed)
+    await channel.send(embed=embed)
 
 
-# Leave message
 @bot.event
 async def on_member_remove(member):
     channel = discord.utils.get(
@@ -67,39 +75,46 @@ async def on_member_remove(member):
         name="welcome"
     )
 
-    if channel:
-        embed = discord.Embed(
-            title="😢 Member Left",
-            description=(
-                f"**{member.name}** has left **{member.guild.name}**.\n\n"
-                f"👥 **Total Members:** {member.guild.member_count}"
-            ),
-            color=discord.Color.red()
-        )
+    if channel is None:
+        print("Welcome channel not found.")
+        return
 
-        # Member profile picture
+    embed = discord.Embed(
+        title="😢 Member Left",
+        description=(
+            f"**{member.name}** has left the server.\n\n"
+            f"We currently have **{member.guild.member_count}** members."
+        ),
+        color=discord.Color.red()
+    )
+
+    embed.set_thumbnail(url=member.display_avatar.url)
+
+    if member.guild.icon:
         embed.set_author(
-            name=member.name,
-            icon_url=member.display_avatar.url
+            name=member.guild.name,
+            icon_url=member.guild.icon.url
         )
 
-        # Server profile picture
-        if member.guild.icon:
-            embed.set_thumbnail(url=member.guild.icon.url)
+    embed.set_footer(
+        text=f"{member.guild.name} • Member Leave"
+    )
 
-        embed.set_footer(
-            text=f"{member.guild.name} • Members: {member.guild.member_count}"
-        )
-
-        await channel.send(embed=embed)
+    await channel.send(embed=embed)
 
 
-# Test command
 @bot.command()
 async def ping(ctx):
-    await ctx.send("pong")
+    await ctx.send("🏓 Pong!")
 
 
-# Run bot
+# Railway Variable बाट token लिने
+token = os.getenv("DISCORD_TOKEN")
+
+if not token:
+    raise RuntimeError(
+        "DISCORD_TOKEN is missing. Add it in Railway Variables."
+    )
+
 print("Starting bot...")
-bot.run(config.DISCORD_TOKEN)
+bot.run(token)
